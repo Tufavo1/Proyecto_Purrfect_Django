@@ -1,0 +1,480 @@
+{% extends "./base.html" %} {% load static %} {% block head %}
+<title>Perfil · Purrfect Pet Shop</title>
+{% endblock %} {% block navItems %}
+<ul class="navbar-nav mb-2 mb-lg-0">
+  <li class="nav-item">
+    <a class="nav-link" href="/caninos">Perros</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/mininos">Gatos</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/alados">Aves</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/acuaticos">Peces</a>
+  </li>
+  <li class="nav-item" {% if request.session.tipo != 2 %} style="display: none;" {% endif%}>
+    <a class="nav-link" href="/admin">Administrador</a>
+  </li>
+</ul>
+{% endblock %} {% block body %}
+<div class="container overflow-hidden pb-5" style="padding-top: 10rem">
+  <div class="row gx-5">
+    <div class="col-7">
+      <div class="content-box p-3">
+        <h4>Perfil</h4>
+        <p>
+          Esta sección te permite tener un control completo sobre tu experiencia
+          de compra. Aquí, puedes guardar y actualizar tu información personal,
+          como tu nombre, dirección de envío, información de contacto y
+          preferencias de comunicación.
+        </p>
+        <div class="row">
+          <div class="col-6 text-end">Nombre:</div>
+          <div class="col-6 bold" id="nombre">{{request.session.nombre}}</div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Correo:</div>
+          <div class="col-6 bold" id="email">{{request.session.email}}</div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Nombre de Usuario:</div>
+          <div class="col-6 bold" id="username">
+            {{request.session.username}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Contraseña:</div>
+          <div class="col-6 bold" id="password">
+            {{request.session.password}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Dirección:</div>
+          <div class="col-6 bold" id="direccion">
+            {{request.session.direccion}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Número de teléfono:</div>
+          <div class="col-6 bold" id="telefono">
+            {{request.session.telefono}}
+          </div>
+        </div>
+        <div class="text-center mt-3">
+          <button
+            class="btn col-7"
+            data-bs-toggle="modal"
+            data-bs-target="#userDataModal"
+            id="btn-edit"
+          >
+            Modificar datos
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-5">
+      <div class="content-box p-3" id="sub-info">
+        {% if request.session.subscribed %}
+        <h4>Subscripción</h4>
+        <p>
+          Estado: <b>Suscrito</b><br />
+          ¡Gracias por unirte al programa de suscripción de Purrfect PetShop!
+          Ahora eres parte de nuestra comunidad de amantes de los animales
+          comprometidos con apoyar a nuestra fundación sin fines de lucro que se
+          dedica a rescatar y cuidar a las mascotas más necesitadas.<br />
+          <b
+            >Tu suscripción no solo ayuda a mejorar la vida de los animales
+            necesitados, sino que también te brinda un 5% de descuento en todas
+            tus compras de productos para mascotas en nuestra tienda en
+            línea.</b
+          ><br />
+          Esperamos que disfrutes de los beneficios de ser un miembro de
+          Purrfect PetShop y agradecemos tu apoyo en nuestra misión.
+        </p>
+        <div class="text-center">
+          <button
+            class="btn col-10"
+            data-bs-toggle="modal"
+            data-bs-target="#unsubModal"
+            data-bs-whatever="test"
+          >
+            Anular Subsripcion
+          </button>
+        </div>
+        {% else %}
+        <h4>Subscripción</h4>
+        <p>
+          Estado: <b>No Suscrito</b><br />
+          ¡Únete a nuestro programa de suscripción para ayudar a las mascotas
+          necesitadas y obtener un descuento en tus compras! Con tu
+          subscripción, estarás apoyando a nuestra fundación sin fines de lucro
+          que se dedica a rescatar y cuidar a los animales más necesitados.<br />
+          <b>
+            Además, como miembro, recibirás un 5% de descuento en todas tus
+            compras de productos para mascotas en nuestra tienda en línea.
+          </b>
+        </p>
+        <div class="text-center">
+          <button
+            class="btn col-10"
+            data-bs-toggle="modal"
+            data-bs-target="#subModal"
+            data-bs-whatever="test"
+          >
+            Suscribirse
+          </button>
+        </div>
+        {% endif%}
+      </div>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="content-box p-3">
+        <h4>Historial de Compras</h4>
+        <p>
+          Aquí, puedes ver un resumen completo de cada pedido que hayas
+          realizado, incluyendo la fecha, los artículos comprados, el costo
+          total y el estado de entrega. Además, puedes realizar un seguimiento
+          de tus pedidos actuales y ver el historial de seguimiento de cada uno
+          de ellos. Si necesitas realizar una devolución o cambio de algún
+          producto, también podrás hacerlo desde esta sección.
+        </p>
+        <table class="table">
+          <caption></caption>
+          <thead>
+            <tr>
+              <th scope="col">N° Boleta</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Productos Comprados</th>
+              <th scope="col">Total</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider">
+            {% for b in bol %}
+            <tr
+              class="pedDetail {% if b.estado == "Por enviar" %}undelivered{% elif b.estado == "Enviado" %}sent{% else %}delivered{% endif %}"
+              type="a"
+              data-bs-toggle="modal"
+              data-bs-target="#pedidoModal"
+            >
+              <th class="celdaPedId" scope="row">{{b.id}}</th>
+              <td class="celdaPedFecha">{{b.fecha}}</td>
+              <td class="celdaPedProd"><ul class="mb-0">
+                {% for detalles in det %}
+                  {% for d in detalles %}
+                    {% if d.id_boleta == b %}
+                    <li>{{d.producto.nombre}} x {{d.cantidad}}</li>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              </ul></td>
+              <td class="celdaPedTot">${{b.total}}</td>
+              <td class="celdaPedEst">{{b.estado}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal datos usuario -->
+<div
+  class="modal fade"
+  id="userDataModal"
+  tabindex="-1"
+  aria-labelledby="userDataModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="userDataModalLabel">
+          Modificar datos
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        id="eUser"
+        action="/editUser"
+        method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-1">
+            <label for="eUsername" class="col-form-label">
+              Nombre de Usuario:
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              name="eUsername"
+              id="eUsername"
+              readonly
+            />
+          </div>
+          <div class="mb-1">
+            <label for="ePassword" class="col-form-label"> Contraseña: </label>
+            <input
+              type="password"
+              class="form-control"
+              name="ePassword"
+              id="ePassword"
+            />
+          </div>
+          <div class="mb-1">
+            <label for="eNombre" class="col-form-label">
+              Nombre completo:
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              name="eNombre"
+              id="eNombre"
+            />
+          </div>
+          <div class="mb-1">
+            <label for="eEmail" class="col-form-label"> Correo: </label>
+            <input
+              type="email"
+              class="form-control"
+              name="eEmail"
+              id="eEmail"
+            />
+          </div>
+          <div class="mb-1">
+            <label for="eDireccion" class="col-form-label"> Dirección: </label>
+            <input
+              type="text"
+              class="form-control"
+              name="eDireccion"
+              id="eDireccion"
+            />
+          </div>
+          <div class="mb-1">
+            <label for="eTelefono" class="col-form-label">
+              Número de teléfono:
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              name="eTelefono"
+              id="eTelefono"
+            />
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: center">
+          <button type="submit" class="btn col-8">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal suscripción -->
+<div
+  class="modal fade"
+  id="subModal"
+  tabindex="-1"
+  aria-labelledby="subModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="subModalLabel">Suscripción</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="sub-form"
+        action="/addSub"
+        method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p>
+            El monto de la donación es voluntario e irá directamente hacía la
+            fundación sin fines de lucro.
+          </p>
+          <div class="mb-1">
+            <label for="donacion" class="col-form-label">Monto donación:</label>
+            <input
+              type="number"
+              class="form-control"
+              id="donacion"
+              name="donacion"
+              min="1"
+            />
+          </div>
+          <div class="mb-1">
+            <label for="titular" class="col-form-label"
+              >Nombre del titular:</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="titular"
+              name="titular"
+            />
+          </div>
+          <div class="mb-1">
+            <label for="cardNumber" class="col-form-label"
+              >Número de tarjeta:</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="cardNumber"
+              name="cardNumber"
+            />
+          </div>
+          <div class="row mb-1">
+            <div class="col-6">
+              <label for="expireDate" class="col-form-label"
+                >Mes expiración:</label
+              >
+              <input
+                type="month"
+                class="form-control"
+                id="expireDate"
+                name="expireDate"
+              />
+            </div>
+            <div class="col-6">
+              <label for="cvv" class="col-form-label">CVV:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="cvv"
+                name="cvv"
+                min="100"
+                max="999"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: center">
+          <button type="submit" class="btn col-8">Suscribirse</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal desuscripcion -->
+<div
+  class="modal fade"
+  id="unsubModal"
+  tabindex="-1"
+  aria-labelledby="unsubModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="unsubModalLabel">
+          Anular Suscripción
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" style="text-align: center">
+        <p>¿Estás seguro de cancelar tu suscripción a Purrfect PetShop?</p>
+      </div>
+      <div class="modal-footer" style="justify-content: center">
+        <button
+          type="button"
+          class="btn btn-search col-5"
+          id="btn-cancel"
+          data-bs-dismiss="modal"
+        >
+          Cancelar
+        </button>
+        <a type="button" class="btn btn-search col-5" id="btn-confirm" href="delSub">
+          Confirmar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal datos pedido -->
+<div
+  class="modal fade"
+  id="pedidoModal"
+  tabindex="-1"
+  aria-labelledby="pedidoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="pedidoModalLabel">
+          Información del Pedido
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-6 text-end">Número de Boleta:</div>
+          <div class="col-6 bold" id="idPed"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Fecha de Compra:</div>
+          <div class="col-6 bold" id="pedFecha"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Productos Comprados:</div>
+          <div class="col-6 bold ps-0" id="pedProd"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Total:</div>
+          <div class="col-6 bold" id="pedTot"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Estado del Pedido:</div>
+          <div class="col-6 bold" id="pedEst"></div>
+        </div>
+        <div class="text-center mt-3" id="pedIcon">
+        </div>
+        <div class="text-center mt-3">
+          <p class="mt-2 mb-0" id="pedMsg">
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center" id="pedAct">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
+<script src="{% static 'js/jquery.validate.min.js' %}"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
+  crossorigin="anonymous"
+></script>
+<script src="{% static 'js/utilities.js' %}"></script>
+<script src="{% static 'js/carrito.js' %}"></script>
+<script src="{% static 'js/perfil.js' %}"></script>
+{% endblock %}

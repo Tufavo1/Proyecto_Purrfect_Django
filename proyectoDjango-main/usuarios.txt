@@ -1,0 +1,10 @@
+- SUPERUSUARIO DJANGO
+- username: admin
+- password: 123
+
+USUARIOS PÁGINA
+- username: admin
+- password: 123
+
+- username: gia.soto
+- password: 123

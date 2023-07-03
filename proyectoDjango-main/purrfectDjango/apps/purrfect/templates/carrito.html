@@ -1,0 +1,190 @@
+{% extends "./base.html" %} {% load static %} {% block head %}
+<title>Carrito · Purrfect Pet Shop</title>
+{% endblock %} {% block navItems %}
+<ul class="navbar-nav mb-2 mb-lg-0">
+  <li class="nav-item">
+    <a class="nav-link" href="/caninos">Perros</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/mininos">Gatos</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/alados">Aves</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/acuaticos">Peces</a>
+  </li>
+  <li class="nav-item" {% if request.session.tipo != 2 %} style="display: none;" {% endif%}>
+    <a class="nav-link" href="/admin">Administrador</a>
+  </li>
+</ul>
+{% endblock %} {% block body %}
+<div class="container overflow-hidden pb-5" style="padding-top: 10rem">
+  <div class="row gx-5">
+    <div class="col-9 mb-5">
+      <div class="content-box p-3">
+        <h4>Carrito de Compras</h4>
+        <p>
+          ¡Estás a un paso de finalizar tu compra! En la pantalla de carrito de
+          compras podrás ver todos los productos que has elegido y el resumen
+          final de tu pedido. Haz clic en "Pagar", ingresa los datos solicitados
+          para realizar la compra y nosotros nos encargaremos de enviar los
+          productos directamente a tu hogar. ¡Gracias por elegir Purrfect para
+          consentir a tu mascota!
+        </p>
+        <table class="table" id="carrito-resumen">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Descripción</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="carrito-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="content-box p-3">
+        <h4>Resumen de la Compra</h4>
+        <div class="row">
+          <div class="col-6 text-end">Subtotal:</div>
+          <div class="col-6 bold precio" id="subtotal"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">IVA (19%):</div>
+          <div class="col-6 bold precio" id="iva"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Subtotal + IVA:</div>
+          <div class="col-6 bold precio" id="subtotalIva"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Descuentos:</div>
+          <div class="col-6 bold precio" id="desc"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Total:</div>
+          <div class="col-6 bold precio" id="totalF"></div>
+        </div>
+        <div class="text-center mt-3">
+          <button
+            class="btn col-10"
+            data-bs-toggle="modal"
+            data-bs-target="#pagarModal"
+            data-bs-whatever="test"
+          >
+            Pagar
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 mt-5 mb-5">
+      <div class="content-box p-3">
+        <h4>Declaración de Seguridad</h4>
+        <p>
+          La seguridad y protección de tu información personal es una de
+          nuestras principales prioridades en Purrfect. Utilizamos los más altos
+          estándares de seguridad para proteger tus datos y mantenerlos
+          completamente confidenciales en todo momento. Además, cumplimos con
+          todas las leyes y regulaciones relevantes en cuanto a la protección de
+          datos. Puedes estar seguro de que tus datos personales y de pago están
+          en buenas manos cuando compras en Purrfect.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+  class="modal fade"
+  id="pagarModal"
+  tabindex="-1"
+  aria-labelledby="pagarModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="pagarModalLabel">Pagar</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="pagar-form"
+        action="/pago"
+        method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-1">
+            <label for="titular" class="col-form-label"
+              >Nombre del titular:</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="titular"
+              name="titular"
+            />
+          </div>
+          <div class="mb-1">
+            <label for="cardNumber" class="col-form-label"
+              >Número de tarjeta:</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="cardNumber"
+              name="cardNumber"
+            />
+          </div>
+          <div class="row mb-1">
+            <div class="col-6">
+              <label for="expireDate" class="col-form-label"
+                >Mes expiración:</label
+              >
+              <input
+                type="month"
+                class="form-control"
+                id="expireDate"
+                name="expireDate"
+              />
+            </div>
+            <div class="col-6">
+              <label for="cvv" class="col-form-label">CVV:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="cvv"
+                name="cvv"
+                min="100"
+                max="999"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: center">
+          <button type="submit" class="btn col-8">Confirmar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
+<script src="{% static 'js/jquery.validate.min.js' %}"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
+  crossorigin="anonymous"
+></script>
+<script src="{% static 'js/carrito.js' %}"></script>
+<script src="{% static 'js/funciones.js' %}"></script>
+<script src="{% static 'js/utilities.js' %}"></script>
+<script src="{% static 'js/pago.js' %}"></script>
+{% endblock %}

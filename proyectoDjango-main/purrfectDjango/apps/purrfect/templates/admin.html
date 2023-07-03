@@ -1,0 +1,524 @@
+{% extends "./base.html" %} {% load static %} {% block head %}
+<title>Administrador · Purrfect Pet Shop</title>
+{% endblock %} {% block navItems %}
+<ul class="navbar-nav mb-2 mb-lg-0">
+  <li class="nav-item">
+    <a class="nav-link" href="/caninos">Perros</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/mininos">Gatos</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/alados">Aves</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/acuaticos">Peces</a>
+  </li>
+  <li class="nav-item" id="admin-link">
+    <a class="nav-link active" href="/admin">Administrador</a>
+  </li>
+</ul>
+{% endblock %} {% block body %}
+<div class="container overflow-hidden pb-5" style="padding-top: 10rem">
+  <div class="row gx-5">
+    <div class="col-12">
+      <div class="container content-box p-3">
+        <h4>Gestión de Productos</h4>
+        <p>
+          La funcionalidad de administrar productos en Purrfect es una
+          herramienta esencial para los administradores de la tienda en línea.
+          Desde esta sección, pueden agregar nuevos productos, actualizar la
+          información de los productos existentes, eliminar productos que ya no
+          estén disponibles y administrar el inventario para garantizar que
+          siempre haya suficiente stock disponible. Los administradores también
+          pueden establecer precios, agregar descripciones detalladas y fotos de
+          alta calidad para cada producto para facilitar la navegación de los
+          clientes en la tienda en línea.
+        </p>
+        <button
+          type="button"
+          class="btn col-4 mb-3"
+          data-bs-toggle="modal"
+          data-bs-target="#nuevoModal"
+        >
+          Agregar nuevo producto
+        </button>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Sku</th>
+              <th scope="col">Imagen</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Marca</th>
+              <th scope="col">Categoría</th>
+              <th scope="col">Animal</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Stock</th>
+              <th scope="col">Fecha de Ingreso</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider listaProductos">
+            {% for p in prod %}
+            <tr
+              type="a"
+              data-bs-toggle="modal"
+              data-bs-target="#productoModal"
+              class="editProducto"
+            >
+              <th class="celdaId" scope="row">
+                {{p.sku}}
+              </th>
+              <td class="celdaImagen">
+                <img src="{{p.imagen.url}}" class="table-img" />
+              </td>
+              <td class="celdaProducto">{{p.nombre}}</td>
+              <td class="celdaMarca">{{p.marca}}</td>
+              <td class="celdaCategoria">
+                <p class="id" style="display: none">{{p.categoria.id}}</p>
+                <p class="peso" style="display: none">{{p.has_peso}}</p>
+                {{p.categoria.nombre}}
+              </td>
+              <td class="celdaAnimal">
+                <p class="id" style="display: none">{{p.animal.id}}</p>
+                {{p.animal.nombre}}
+              </td>
+              <td class="celdaPrecio">{{p.precio}}</td>
+              <td class="celdaStock">{{p.stock}}</td>
+              <td>{{p.fecha_ingreso|date:"d-m-Y"}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="container content-box p-3">
+        <h4>Gestión de Pedidos</h4>
+        <p>
+          La funcionalidad de gestionar pedidos y envíos en Purrfect permite a
+          los administradores manejar de manera efectiva y eficiente el proceso
+          de cumplimiento de los pedidos. Desde esta sección, los
+          administradores pueden ver los detalles de cada pedido, como la
+          dirección de envío, los productos solicitados y el método de pago
+          utilizado. También pueden actualizar el estado de cada pedido, desde
+          el procesamiento hasta el envío y la entrega. En resumen, la
+          funcionalidad de gestionar pedidos y envíos en Purrfect es crucial
+          para garantizar que nuestros clientes reciban sus productos a tiempo y
+          en perfectas condiciones, lo que aumenta su satisfacción y fidelidad a
+          nuestra tienda en línea.
+        </p>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">N° Boleta</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Fecha Compra</th>
+              <th scope="col">Productos Comprados</th>
+              <th scope="col">Total</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="table-group-divider">
+            {% for b in bol %}
+            <tr
+              class="pedDetail {% if b.estado == "Por enviar" %}undelivered{% elif b.estado == "Enviado" %}sent{% else %}delivered{% endif %}"
+              type="a"
+              data-bs-toggle="modal"
+              data-bs-target="#pedidoModal"
+            >
+              <th class="celdaPedId" scope="row">{{b.id}}</th>
+              <td class="celdaPedCliente">{{b.comprador.nombre}}</td>
+              <td class="celdaPedFecha">{{b.fecha}}</td>
+              <td class="celdaPedProd"><ul class="mb-0">
+                {% for detalles in det %}
+                  {% for d in detalles %}
+                    {% if d.id_boleta == b %}
+                    <li>{{d.producto.nombre}} x {{d.cantidad}}</li>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              </ul></td>
+              <td class="celdaPedTot">${{b.total}}</td>
+              <td class="celdaPedEst">{{b.estado}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="nuevoModal"
+  tabindex="-1"
+  aria-labelledby="nuevoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="nuevoModalLabel">
+          Ficha del Producto
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        id="nuevaFicha"
+        action="/addProd"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row mb-1">
+            <div class="col-3">
+              <label for="id-producto" class="col-form-label">Sku</label>
+              <input
+                name="nuevoSku"
+                type="number"
+                class="form-control"
+                id="nuevo-sku-producto"
+                min="0"
+              />
+            </div>
+            <div class="col-9">
+              <label for="nuevo-marca-producto" class="col-form-label"
+                >Marca</label
+              >
+              <input
+                name="nuevoMarca"
+                type="text"
+                class="form-control"
+                id="nuevo-marca-producto"
+              />
+            </div>
+          </div>
+          <div class="mb-1">
+            <label for="nuevo-nombre-producto" class="col-form-label"
+              >Nombre</label
+            >
+            <input
+              name="nuevoNombre"
+              type="text"
+              class="form-control"
+              id="nuevo-nombre-producto"
+            />
+          </div>
+          <div class="row mb-1">
+            <div class="col-4">
+              <label for="nuevo-precio-producto" class="col-form-label"
+                >Precio</label
+              >
+              <input
+                name="nuevoPrecio"
+                type="number"
+                class="form-control"
+                id="nuevo-precio-producto"
+                min="1"
+              />
+            </div>
+            <div class="col-4">
+              <label for="nuevo-stock-producto" class="col-form-label"
+                >Stock</label
+              >
+              <input
+                name="nuevoStock"
+                type="number"
+                class="form-control"
+                id="nuevo-stock-producto"
+                min="0"
+              />
+            </div>
+            <div class="col-4 d-flex align-items-center">
+              <input
+                name="nuevoHasPeso"
+                type="checkbox"
+                class="form-check-input m-0"
+                id="nuevo-has-preso-producto"
+                value=""
+              />
+              <label
+                for="nuevo-has-preso-producto"
+                class="form-check-label ms-1"
+                >Distintos Pesos</label
+              >
+            </div>
+          </div>
+          <div class="row mb-1">
+            <div class="col-6">
+              <label for="nuevo-animal-producto" class="col-form-label"
+                >Animal</label
+              >
+              <select
+                class="form-select animal-combobox"
+                id="nuevo-animal-producto"
+                name="nuevoAnimal"
+              >
+                {% for a in anim %}
+                <option value="{{a.id}}">{{a.nombre}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label for="nuevo-categoria-producto" class="col-form-label"
+                >Categoría</label
+              >
+              <select
+                class="form-select categoria-combobox"
+                id="nuevo-categoria-producto"
+                name="nuevoCategoria"
+              >
+                {% for c in cate %}
+                <option value="{{c.id}}">{{c.nombre}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="mb-1">
+            <label for="nuevo-imagen-producto" class="col-form-label"
+              >Imagen</label
+            >
+            <input
+              name="nuevoImagen"
+              type="file"
+              class="form-control"
+              id="nuevo-imagen-producto"
+            />
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: center">
+          <button type="submit" class="btn btn-search col-5" id="btn-agregar">
+            Agregar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="productoModal"
+  tabindex="-1"
+  aria-labelledby="productoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="productoModalLabel">
+          Ficha del Producto
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="fichaProducto"
+        action="/editProd"
+        method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row mb-1">
+            <div class="col-3">
+              <label for="id-producto" class="col-form-label">Sku</label>
+              <input
+                name="idProducto"
+                type="number"
+                class="form-control"
+                id="id-producto"
+                readonly
+              />
+            </div>
+            <div class="col-9">
+              <label for="marca-producto" class="col-form-label">Marca</label>
+              <input
+                name="marcaProducto"
+                type="text"
+                class="form-control"
+                id="marca-producto"
+              />
+            </div>
+          </div>
+          <div class="mb-1">
+            <label for="nombre-producto" class="col-form-label">Nombre</label>
+            <input
+              name="nombreProducto"
+              type="text"
+              class="form-control"
+              id="nombre-producto"
+            />
+          </div>
+          <div class="row mb-1">
+            <div class="col-4">
+              <label for="precio-producto" class="col-form-label">Precio</label>
+              <input
+                name="precioProducto"
+                type="number"
+                class="form-control"
+                id="precio-producto"
+                min="1"
+              />
+            </div>
+            <div class="col-4">
+              <label for="stock-producto" class="col-form-label">Stock</label>
+              <input
+                name="stockProducto"
+                type="number"
+                class="form-control"
+                id="stock-producto"
+                min="0"
+              />
+            </div>
+            <div class="col-4 d-flex align-items-center">
+              <input
+                name="hasPesoProducto"
+                type="checkbox"
+                class="form-check-input m-0"
+                id="nuevo-has-peso-producto"
+                value=""
+              />
+              <label
+                for="nuevo-has-preso-producto"
+                class="form-check-label ms-1"
+                >Distintos Pesos</label
+              >
+            </div>
+          </div>
+          <div class="row mb-1">
+            <div class="col-6">
+              <label for="animal-producto" class="col-form-label">Animal</label>
+              <select
+                name="animalProducto"
+                class="form-select animal-combobox"
+                id="animal-producto"
+              >
+                {% for a in anim %}
+                <option value="{{a.id}}">{{a.nombre}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label for="categoria-producto" class="col-form-label"
+                >Categoría</label
+              >
+              <select
+                name="categoriaProducto"
+                class="form-select categoria-combobox"
+                id="categoria-producto"
+              >
+                {% for c in cate %}
+                <option value="{{c.id}}">{{c.nombre}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="row text-center">
+              <p class="mb-0 mt-2 text-center">Imagen Actual</p>
+              <div class="d-flex justify-content-center">
+                <img src="" id="imagen-actual" class="ficha-img"></img>
+              </div>
+          </div>
+          <div>
+            <label for="imagen-producto" class="col-form-label"
+              >Sustituir Imagen</label
+            >
+            <input
+              name="imagenProducto"
+              type="file"
+              class="form-control"
+              id="imagen-producto"
+            />
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: center">
+          <button type="submit" class="btn btn-search col-5" id="btn-guardar">
+            Guardar
+          </button>
+          <a type="button" class="btn btn-search col-5" id="btn-eliminar">
+            Eliminar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="pedidoModal"
+  tabindex="-1"
+  aria-labelledby="pedidoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="pedidoModalLabel">
+          Información del Pedido
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-6 text-end">Número de Boleta:</div>
+          <div class="col-6 bold" id="idPed"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Cliente:</div>
+          <div class="col-6 bold" id="pedCliente"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Fecha de Compra:</div>
+          <div class="col-6 bold" id="pedFecha"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Productos Comprados:</div>
+          <div class="col-6 bold ps-0" id="pedProd"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Total:</div>
+          <div class="col-6 bold" id="pedTot"></div>
+        </div>
+        <div class="row">
+          <div class="col-6 text-end">Estado del Pedido:</div>
+          <div class="col-6 bold" id="pedEst"></div>
+        </div>
+      </div>
+      <div class="text-center mb-3" id="pedIcon">
+      </div>
+      <div class="modal-footer" id="pedAct" style="justify-content: center">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script src="{% static 'js/jquery-3.6.4.min.js' %}"></script>
+<script src="{% static 'js/jquery.validate.min.js' %}"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
+  crossorigin="anonymous"
+></script>
+<script src="{% static 'js/admin.js' %}"></script>
+<script src="{% static 'js/utilities.js' %}"></script>
+<script src="{% static 'js/carrito.js' %}"></script>
+{% endblock %}

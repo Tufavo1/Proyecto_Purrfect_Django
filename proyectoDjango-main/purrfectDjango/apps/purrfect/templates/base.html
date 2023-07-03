@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous" />
+  <script src="https://kit.fontawesome.com/ce5e571ae4.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  {% block head %}
+  {% endblock %}
+</head>
+
+<body>
+  <header class="fixed-top">
+    <nav class="navbar navbar-expand-lg topbar">
+      <div class="container-fluid">
+        <a class="navbar-brand p-0" href="/"><img src="{% static 'img/Purrfect-colorIcon.png' %}" class="img-fluid"
+            alt="Purrfect Icon" style="height: 5rem" /></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          {% block navItems %}
+          {% endblock %}
+          <form class="d-flex me-auto" role="search">
+            <input class="form-control ms-3 me-1" type="search" placeholder="Buscar en esta página" aria-label="Search"
+              style="font-family: Roboto, sans-serif;" />
+          </form>
+          <select class="form-select bold" id="currency">
+            <option value="1" selected>CLP</option>
+            <option value="2">USD</option>
+            <option value="3">EUR</option>
+          </select>
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <div class="menu container"><!--carrito -->
+              <div class="submenu">
+                <li class="nav-item" style="justify-content: center">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                  <div id="carrito">
+                    <table id="lista-carrito">
+                      <thead>
+                        <tr>
+                          <th>Producto</th>
+                          <th>Descripcion</th>
+                          <th>Peso</th>
+                          <th>Precio</th>
+                          <th>Cantidad</th>
+                          <th>Subtotal</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody id="carrito-body"></tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="5">Total:</td>
+                          <td id="total">$0</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                    <div class="btn-container">
+                      <a id="vaciar-carrito" class="btn">Vaciar Carrito</a>
+                      <a id="btn-comprar" class="btn">Comprar</a>
+                    </div>
+                  </div>
+                  </a>
+                </li>
+              </div>
+            </div>
+            <li class="nav-item">
+              <div class="dropstart">
+                <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-solid fa-circle-user"></i>
+                </a>
+                <ul class="dropdown-menu" id="user-info">
+                  {% if 'username' in request.session %}
+                  <p class="m-0 bold" id="dropdown-nombre">
+                    <i class="fa-solid fa-face-smile"></i>
+                    {{request.session.nombre}}
+                  </p>
+                  <p class="m-0">
+                      <i class="fa-solid fa-circle-user"></i>
+                      {{request.session.username}}
+                  </p>
+                  <p class="m-0" id="dropdown-substate">
+                      <i class="fa-solid fa-crown"></i>
+                      {% if request.session.subscribed %}
+                      Suscrito
+                      {% else %}
+                      No Suscrito
+                      {% endif %}
+                  </p>
+                  <p id="subState" class="mb-0" style="display: none;">{{request.session.subscribed}}</p>
+                  <li>
+                      <a class="dropdown-item" href="/perfil">Ir al perfil</a>
+                  </li>
+                  <li>
+                      <hr class="dropdown-divider" />
+                  </li>
+                  <button class="btn dropdown-btn" onclick="document.location='/closeSession'">
+                      Cerrar Sesión
+                  </button>
+                  {% else %}
+                  <p class="m-0">
+                    Inicia sesión o regístrate para recibir promociones exclusivas.
+                    ¡Únete a nuestra comunidad de amantes de las mascotas!
+                  </p>
+                  <li>
+                      <hr class="dropdown-divider" />
+                  </li>
+                  <button class="btn dropdown-btn" onclick="document.location='/login'">
+                      Iniciar Sesión          
+                  </button>
+                  {% endif%}
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="utilities-container">
+    <button class="lightMode" id="lightBtn">
+      <i class="fa-solid fa-sun"></i>
+    </button>
+    <div id="reloj"></div>
+  </div>
+
+  {% block body %}
+  {% endblock %}
+
+  <footer class="container-fluid">
+    <div class="row">
+      <div class="col-md-9">
+        <h4>Sobre Nosotros</h4>
+        <p>
+          Somos una organización dedicada a brindar productos de alta calidad
+          para sus amigos de cuatro patas. Pero no solo nos enfocamos en el
+          bienestar de sus mascotas, también estamos comprometidos con el
+          bienestar de otros animales que necesitan ayuda. Nos enorgullece ser
+          una tienda que ayuda a una fundación sin fines de lucro dedicada al
+          rescate y cuidado de animales en situaciones de maltrato y abandono.
+          Creemos que cada vida animal es valiosa y merece amor y respeto. Por
+          esta razón, destinamos la totalidad de nuestras ganancias a esta
+          fundación, para ayudarles a continuar con su importante labor.
+        </p>
+      </div>
+      <div class="col-md-3 contacto">
+        <h4>Contacto</h4>
+        <p>
+          <i class="fa-regular fa-envelope"></i>
+          ventas@purrfect.cl
+        </p>
+        <p>
+          <i class="fa-solid fa-phone"></i>
+          +56 9 3439 5563
+        </p>
+        <p>
+          <i class="fa-brands fa-facebook"></i>
+          Purrfect Pet Shop
+        </p>
+        <p>
+          <i class="fa-brands fa-instagram"></i>
+          @purrfect
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="liveAlertPlaceholder"></div>
+  {% block script %}
+  {% endblock %}
+</body>
+
+</html>
